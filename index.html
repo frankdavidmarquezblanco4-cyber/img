@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paseo Virtual 360 - Todo en uno</title>
+
+  <!-- Librería visor 360 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f1420;
+      color: #eaf0ff;
+    }
+    header {
+      padding: 14px 16px;
+      background: #171f31;
+      border-bottom: 1px solid #273451;
+    }
+    header h1 { font-size: 1.15rem; margin-bottom: 4px; }
+    header p { font-size: 0.9rem; opacity: 0.85; }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 290px;
+      height: calc(100vh - 73px);
+    }
+
+    #viewer {
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    .panel {
+      border-left: 1px solid #273451;
+      background: #131a2a;
+      padding: 14px;
+      overflow-y: auto;
+    }
+    .panel h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .panel button {
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #2e6bff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .panel button:hover {
+      background: #1f56d8;
+    }
+    .panel hr {
+      border: none;
+      border-top: 1px solid #273451;
+      margin: 14px 0;
+    }
+    .panel ul {
+      margin-left: 18px;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      opacity: 0.85;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+      }
+      .panel {
+        border-left: none;
+        border-top: 1px solid #273451;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Paseo Virtual 360 (JavaScript, archivo único)</h1>
+    <p>Demo tipo Street View para clase</p>
+  </header>
+
+  <main>
+    <section id="viewer"></section>
+
+    <aside class="panel">
+      <h2>Mapa rápido</h2>
+      <button data-scene="entrada">📍 Entrada</button>
+      <button data-scene="pasillo">📍 Pasillo</button>
+      <button data-scene="aula">📍 Aula</button>
+
+      <hr />
+      <h2>Cómo usar</h2>
+      <ul>
+        <li>Arrastra para mirar alrededor.</li>
+        <li>Rueda del mouse para zoom.</li>
+        <li>Haz clic en hotspots para avanzar.</li>
+      </ul>
+
+      <p class="note">
+        Nota: coloca tus imágenes 360 en <b>img/</b> con estos nombres:
+        <b>entrada1.jpg</b>, <b>pasillo.jpg</b>, <b>aula.jpg</b>.
+      </p>
+    </aside>
+  </main>
+
+  <script>
+    // Inicializa visor
+    const viewer = pannellum.viewer('viewer', {
+      default: {
+        firstScene: 'entrada',
+        sceneFadeDuration: 900,
+        autoLoad: true
+      },
+
+      scenes: {
+        entrada: {
+          title: 'Entrada',
+          type: 'equirectangular',
+          panorama: './img/marina.jpg',
+          hotSpots: [
+            {
+              pitch: -3,
+              yaw: 25,
+              type: 'scene',
+              text: 'Ir al Pasillo',
+              sceneId: 'pasillo'
+            },
+            {
+              pitch: 10,
+              yaw: -45,
+              type: 'info',
+              text: 'Recepción principal'
+            }
+          ]
+        },
+
+        pasillo: {
+          title: 'Pasillo',
+          type: 'equirectangular',
+          panorama: './img/pasillo.jpg',
+          hotSpots: [
+            {
+              pitch: -1,
+              yaw: 95,
+              type: 'scene',
+              text: 'Ir al Aula',
+              sceneId: 'aula'
+            },
+            {
+              pitch: -4,
+              yaw: -95,
+              type: 'scene',
+              text: 'Volver a Entrada',
+              sceneId: 'entrada'
+            }
+          ]
+        },
+
+        aula: {
+          title: 'Aula',
+          type: 'equirectangular',
+          panorama: './img/aula.jpg',
+          hotSpots: [
+            {
+              pitch: -2,
+              yaw: -120,
+              type: 'scene',
+              text: 'Regresar al Pasillo',
+              sceneId: 'pasillo'
+            },
+            {
+              pitch: 12,
+              yaw: 30,
+              type: 'info',
+              text: 'Zona de presentación / proyector'
+            }
+          ]
+        }
+      }
+    });
+
+    // Botones del panel
+    document.querySelectorAll('button[data-scene]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        viewer.loadScene(btn.dataset.scene);
+      });
+    });
+  </script>
+</body>
+</html>
